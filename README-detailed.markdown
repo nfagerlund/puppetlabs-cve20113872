@@ -7,16 +7,16 @@ This module will help you permanently protect your site from attacks on CVE-2011
 
 Puppet agent identifies the puppet master by comparing the puppet master DNS name it knows with the names in the master's certificate. The master's cert can include both a common name and a set of alternative DNS names. 
 
-Alternative DNS names are an optional feature for master certs, and they have to be specifically enabled with the `certdnsnames` option. **In versions prior to 2.6.12 and 2.7.6, the Puppet CA will improperly insert any `certdnsnames` values into _agent_ certificates as well as master certificates.** 
+Alternative DNS names are an optional feature for master certs, and they have to be specifically enabled with the `certdnsnames` option. **In versions prior to 2.6.12 and 2.7.6, the Puppet CA will improperly insert any `certdnsnames` values into _agent_ certificates as well as master certificates.** This bug was introduced in Puppet 0.24.0.
 
 This means that if the following two conditions are both met:
 
 * Your puppet master has ever had its `certdnsnames` setting turned on during the current CA's lifetime
 * Any of your agent nodes are configured to contact the master at a DNS alternative name that has ever been included in the `certdnsnames` setting
 
-...then your site probably contains certificates that can be used to impersonate the puppet master in a man-in-the-middle attack. You should update Puppet and/or deactivate the `certdnsnames` setting, but **existing certificates will remain dangerous even after doing so.** 
+...then your site probably contains certificates that can be used to impersonate the puppet master in a man-in-the-middle attack. You should update Puppet to the most recent 2.7.x or 2.6.x release and/or deactivate the `certdnsnames` setting, but **existing certificates will remain dangerous even after doing so.** 
 
-This module will help you to make those existing certificates safe.
+This module will help you to disarm those existing certificates.
 
 ## How the fix works
 
@@ -31,7 +31,7 @@ This module automates _both_ of these tasks. Steps 1 and 2 will secure your site
 
 You have several options for remediating the AltNames vulnerability.
 
-- If you have a **small-to-moderate number of nodes and can trivially SSH to all of them,** you can protect yourself permanently without using this module --- simply delete the `ssldir` from the master and all agents, re-generate the master's certificate, and sign new agent certificates. **See the README-easy-ssh-fix.markdown file** for step-by-step instructions.
+- If you have a **small-to-moderate number of nodes and can trivially SSH to all of them,** you can protect yourself permanently without using this module --- simply delete the `ssldir` from the master and all agents, re-generate the master's certificate, and sign new agent certificates. You may disregard the rest of this guide; see **the README-ssh-only.markdown file** for step-by-step instructions.
 - If mass SSH is impractical but you **don't mind permanently changing the puppet master's DNS name,** you can protect yourself by running only the first two steps of this module. Continue reading for instructions, and stop after step 2.
 - If mass SSH is impractical and you **wish to continue using the current DNS name(s),** (or if you just want long-term protection against accidental re-use of the old names) you should run steps 1 through 5 of the remediation module. Continue reading for instructions.
 
